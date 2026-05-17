@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghostwriter Corp — Automated Content Business</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,700&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0c0c0a;
+  --bg2:#121210;
+  --bg3:#1a1a16;
+  --white:#f0ece3;
+  --muted:rgba(240,236,227,0.45);
+  --faint:rgba(240,236,227,0.15);
+  --accent:#e8c547;
+  --accent2:#d4a843;
+  --green:#4ade80;
+  --red:#f87171;
+  --border:rgba(240,236,227,0.08);
+  --border2:rgba(240,236,227,0.14);
+}
+
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;line-height:1.6}
+
+/* ── CURSOR ── */
+.cursor{position:fixed;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:9999;transition:transform 0.1s;mix-blend-mode:difference}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(232,197,71,0.4);border-radius:50%;pointer-events:none;z-index:9998;transition:all 0.12s ease;transform:translate(-50%,-50%)}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 4rem;
+  mix-blend-mode:normal;
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.15rem;letter-spacing:-0.01em;
+  color:var(--white);
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo span{color:var(--accent)}
+.nav-right{display:flex;align-items:center;gap:2.5rem}
+.nav-right a{
+  font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  transition:color 0.2s;font-weight:500;
+}
+.nav-right a:hover{color:var(--white)}
+.nav-pill{
+  background:var(--accent);color:#0c0c0a;
+  padding:0.5rem 1.2rem;border-radius:100px;
+  font-size:0.75rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
+  color:#0c0c0a !important;
+  transition:transform 0.2s,background 0.2s;
+}
+.nav-pill:hover{transform:scale(1.04);background:var(--accent2) !important}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:flex-end;padding:0 4rem 5rem;
+  position:relative;overflow:hidden;
+}
+
+.hero-noise{
+  position:absolute;inset:0;z-index:0;opacity:0.03;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size:200px;
+}
+
+/* big circle decoration */
+.hero-circle{
+  position:absolute;right:-12vw;top:50%;transform:translateY(-50%);
+  width:55vw;height:55vw;max-width:700px;max-height:700px;
+  border:0.5px solid var(--border2);border-radius:50%;
+  pointer-events:none;z-index:0;
+}
+.hero-circle::after{
+  content:'';position:absolute;inset:15%;
+  border:0.5px solid var(--border);border-radius:50%;
+}
+
+/* floating tag */
+.hero-tag{
+  position:absolute;right:8vw;top:38%;
+  display:flex;align-items:center;gap:8px;z-index:2;
+  border:0.5px solid var(--border2);border-radius:100px;
+  padding:0.5rem 1rem;font-size:0.72rem;font-weight:500;
+  letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);
+  animation:float 4s ease-in-out infinite;
+}
+.hero-tag .dot{width:5px;height:5px;border-radius:50%;background:var(--green);flex-shrink:0;animation:blink 1.4s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+.hero-eyebrow{
+  font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:12px;
+  position:relative;z-index:1;
+  opacity:0;animation:up 0.9s 0.1s ease forwards;
+}
+.hero-eyebrow::before{content:'';display:block;width:40px;height:1px;background:var(--muted)}
+
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,8.5vw,8rem);
+  line-height:1.0;letter-spacing:-0.03em;
+  font-weight:700;position:relative;z-index:1;
+  max-width:14ch;
+  opacity:0;animation:up 0.9s 0.2s ease forwards;
+}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero h1 .line2{display:block;padding-left:3rem}
+
+.hero-sub{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  margin-top:2.5rem;position:relative;z-index:1;
+  opacity:0;animation:up 0.9s 0.35s ease forwards;
+}
+.hero-desc{
+  max-width:380px;font-size:1rem;line-height:1.75;
+  color:var(--muted);font-weight:300;
+}
+.hero-ctas{display:flex;flex-direction:column;align-items:flex-end;gap:1rem}
+.cta-primary{
+  background:var(--accent);color:#0c0c0a;border:none;
+  padding:1rem 2.5rem;border-radius:100px;
+  font-family:'Outfit',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;text-decoration:none;letter-spacing:0.02em;
+  transition:transform 0.2s,box-shadow 0.2s;
+  display:inline-block;
+}
+.cta-primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(232,197,71,0.25)}
+.cta-secondary{
+  font-size:0.8rem;letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  display:flex;align-items:center;gap:8px;transition:color 0.2s;
+}
+.cta-secondary::after{content:'↓';font-size:1rem}
+.cta-secondary:hover{color:var(--white)}
+
+@keyframes up{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+
+/* ── MARQUEE ── */
+.marquee-wrap{
+  border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border);
+  padding:1.1rem 0;overflow:hidden;background:var(--bg2);
+}
+.marquee-track{display:flex;gap:3rem;animation:marquee 22s linear infinite;width:max-content}
+.marquee-item{
+  font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:1rem;white-space:nowrap;
+  font-weight:500;
+}
+.marquee-item span{color:var(--accent);font-size:0.55rem}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ── LAYOUT ── */
+.page-section{padding:8rem 4rem;max-width:1200px;margin:0 auto}
+.divider{height:0.5px;background:var(--border);margin:0 4rem}
+
+/* ── LABEL ── */
+.label{
+  font-size:0.68rem;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:10px;
+}
+.label::before{content:'';display:block;width:24px;height:0.5px;background:var(--muted)}
+
+/* ── HOW IT WORKS ── */
+.how-grid{
+  display:grid;grid-template-columns:1fr 1.8fr;gap:6rem;align-items:start;
+  margin-top:1rem;
+}
+.how-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;
+  letter-spacing:-0.02em;position:sticky;top:8rem;
+}
+.how-title em{font-style:italic;color:var(--accent)}
+.steps-list{display:flex;flex-direction:column;gap:0}
+.step-item{
+  padding:2.2rem 0;border-bottom:0.5px solid var(--border);
+  display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;
+  transition:background 0.2s;cursor:default;
+}
+.step-item:first-child{border-top:0.5px solid var(--border)}
+.step-item:hover .step-content h3{color:var(--accent)}
+.step-num{
+  font-family:'DM Mono',monospace;font-size:0.7rem;
+  color:var(--faint);letter-spacing:0.05em;padding-top:4px;
+  transition:color 0.2s;
+}
+.step-item:hover .step-num{color:var(--accent)}
+.step-content h3{font-size:1.05rem;font-weight:500;margin-bottom:0.5rem;transition:color 0.2s}
+.step-content p{font-size:0.88rem;color:var(--muted);line-height:1.7;font-weight:300}
+.step-tag{
+  display:inline-block;margin-top:0.75rem;
+  font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:3px 10px;border-radius:100px;font-weight:600;
+}
+.tag-free{background:rgba(74,222,128,0.12);color:var(--green)}
+.tag-auto{background:rgba(232,197,71,0.12);color:var(--accent)}
+
+/* ── INCOME CARDS ── */
+.income-header{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  margin-bottom:3rem;flex-wrap:wrap;gap:1rem;
+}
+.income-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;
+  letter-spacing:-0.02em;
+}
+.income-title em{font-style:italic;color:var(--accent)}
+.income-note{font-size:0.85rem;color:var(--muted);max-width:280px;text-align:right;font-weight:300}
+
+.cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border)}
+.income-card{
+  background:var(--bg);padding:2.5rem;
+  transition:background 0.3s;
+  position:relative;overflow:hidden;
+}
+.income-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:var(--accent);transform:scaleX(0);transform-origin:left;
+  transition:transform 0.35s ease;
+}
+.income-card:hover{background:var(--bg2)}
+.income-card:hover::after{transform:scaleX(1)}
+.card-icon{font-size:2rem;margin-bottom:1.5rem;line-height:1}
+.card-badge{
+  font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;
+  padding:3px 10px;border-radius:100px;font-weight:600;
+  background:rgba(232,197,71,0.1);color:var(--accent);
+  display:inline-block;margin-bottom:1rem;
+}
+.income-card h3{font-size:1.1rem;font-weight:500;margin-bottom:0.6rem}
+.income-card p{font-size:0.85rem;color:var(--muted);line-height:1.7;font-weight:300;margin-bottom:1.5rem}
+.income-amount{
+  font-family:'Playfair Display',serif;
+  font-size:2rem;color:var(--white);letter-spacing:-0.02em;
+}
+.income-amount sub{font-size:0.75rem;font-family:'Outfit',sans-serif;color:var(--muted);font-weight:300;vertical-align:middle}
+
+/* ── GENERATOR ── */
+.gen-section{background:var(--bg2);border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border)}
+.gen-inner{max-width:1200px;margin:0 auto;padding:8rem 4rem;display:grid;grid-template-columns:1fr 1.4fr;gap:6rem;align-items:start}
+.gen-left-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2rem,4vw,3rem);line-height:1.1;
+  letter-spacing:-0.02em;position:sticky;top:8rem;
+}
+.gen-left-title em{font-style:italic;color:var(--accent)}
+.gen-left-desc{margin-top:1.2rem;font-size:0.9rem;color:var(--muted);line-height:1.75;font-weight:300;max-width:320px}
+
+/* form */
+.gen-form{display:flex;flex-direction:column;gap:1rem}
+.f-label{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:0.4rem;display:block}
+.f-input,.f-select,.f-textarea{
+  width:100%;background:rgba(240,236,227,0.04);
+  border:0.5px solid var(--border2);border-radius:8px;
+  color:var(--white);font-family:'Outfit',sans-serif;
+  font-size:0.9rem;font-weight:300;padding:0.85rem 1rem;
+  outline:none;transition:border-color 0.2s,background 0.2s;
+  appearance:none;-webkit-appearance:none;
+}
+.f-input:focus,.f-select:focus,.f-textarea:focus{
+  border-color:rgba(232,197,71,0.4);background:rgba(232,197,71,0.03);
+}
+.f-select option{background:#1a1a16}
+.f-textarea{min-height:80px;resize:vertical}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+.gen-submit{
+  width:100%;padding:1.1rem;margin-top:0.5rem;
+  background:var(--accent);color:#0c0c0a;border:none;
+  font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;
+  border-radius:8px;cursor:pointer;
+  transition:transform 0.2s,box-shadow 0.2s,background 0.2s;
+  letter-spacing:0.02em;
+}
+.gen-submit:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(232,197,71,0.2)}
+.gen-submit:disabled{opacity:0.45;cursor:not-allowed;transform:none}
+
+.gen-output{
+  margin-top:1.25rem;
+  background:rgba(0,0,0,0.25);border:0.5px solid var(--border);
+  border-radius:8px;padding:1.5rem;
+  font-family:'DM Mono',monospace;font-size:0.82rem;line-height:1.85;
+  color:rgba(240,236,227,0.75);white-space:pre-wrap;
+  display:none;max-height:420px;overflow-y:auto;
+}
+.gen-output.show{display:block}
+.gen-output::-webkit-scrollbar{width:3px}
+.gen-output::-webkit-scrollbar-track{background:transparent}
+.gen-output::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+.gen-loader{height:2px;background:var(--border);border-radius:2px;overflow:hidden;display:none;margin-top:1rem}
+.gen-loader.active{display:block}
+.gen-loader-fill{height:100%;background:var(--accent);animation:loader 1.6s ease-in-out infinite;width:30%}
+@keyframes loader{0%{transform:translateX(-150%)}100%{transform:translateX(450%)}}
+
+.output-bar{display:none;justify-content:flex-end;gap:0.75rem;margin-top:0.75rem}
+.output-bar.show{display:flex}
+.out-btn{
+  font-family:'Outfit',sans-serif;font-size:0.75rem;font-weight:500;
+  letter-spacing:0.05em;text-transform:uppercase;
+  padding:0.5rem 1.1rem;border-radius:100px;cursor:pointer;
+  border:0.5px solid var(--border2);color:var(--muted);background:none;
+  transition:border-color 0.2s,color 0.2s;
+}
+.out-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.testi-card{
+  border:0.5px solid var(--border);border-radius:12px;padding:2rem;
+  background:var(--bg2);
+  transition:border-color 0.3s;
+}
+.testi-card:hover{border-color:var(--border2)}
+.testi-quote{
+  font-family:'Playfair Display',serif;font-size:3rem;
+  color:var(--accent);opacity:0.25;line-height:1;margin-bottom:0.5rem;
+}
+.testi-text{font-size:0.88rem;line-height:1.75;color:var(--muted);font-weight:300;margin-bottom:1.5rem}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(232,197,71,0.1);border:0.5px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.75rem;font-weight:600;color:var(--accent);
+}
+.testi-name{font-size:0.85rem;font-weight:500}
+.testi-role{font-size:0.75rem;color:var(--muted)}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem}
+.pricing-card{
+  border:0.5px solid var(--border);border-radius:12px;padding:2.5rem;
+  background:var(--bg2);position:relative;
+  transition:border-color 0.3s;
+}
+.pricing-card:hover{border-color:var(--border2)}
+.pricing-card.hot{border-color:rgba(232,197,71,0.3);background:rgba(232,197,71,0.04)}
+.hot-badge{
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  background:var(--accent);color:#0c0c0a;
+  font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  padding:4px 16px;border-radius:0 0 8px 8px;
+}
+.plan-name{font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:1.2rem}
+.plan-price{font-family:'Playfair Display',serif;font-size:3.5rem;line-height:1;margin-bottom:0.25rem;letter-spacing:-0.03em}
+.plan-price .period{font-size:1rem;font-family:'Outfit',sans-serif;color:var(--muted);font-weight:300}
+.plan-desc{font-size:0.83rem;color:var(--muted);margin-bottom:2rem;font-weight:300}
+.plan-features{list-style:none;margin-bottom:2rem}
+.plan-features li{
+  font-size:0.85rem;padding:0.6rem 0;
+  border-bottom:0.5px solid var(--border);color:rgba(240,236,227,0.7);
+  display:flex;gap:10px;align-items:flex-start;font-weight:300;
+}
+.plan-features li:last-child{border-bottom:none}
+.plan-features li::before{content:'✦';color:var(--accent);font-size:0.5rem;flex-shrink:0;margin-top:6px}
+.plan-cta{
+  width:100%;padding:0.9rem;border-radius:8px;
+  font-family:'Outfit',sans-serif;font-size:0.88rem;font-weight:600;
+  cursor:pointer;letter-spacing:0.03em;transition:all 0.2s;
+}
+.cta-outline{background:none;border:0.5px solid var(--border2);color:var(--white)}
+.cta-outline:hover{border-color:var(--accent);color:var(--accent)}
+.cta-filled{background:var(--accent);color:#0c0c0a;border:none}
+.cta-filled:hover{background:var(--accent2);transform:translateY(-2px)}
+
+/* ── FOOTER ── */
+footer{
+  border-top:0.5px solid var(--border);
+  padding:4rem;display:flex;justify-content:space-between;align-items:flex-end;
+  flex-wrap:wrap;gap:2rem;
+}
+.footer-brand{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--white)}
+.footer-brand span{color:var(--accent)}
+.footer-brand p{font-size:0.8rem;color:var(--muted);margin-top:0.5rem;font-weight:300}
+.footer-links{display:flex;gap:1.5rem}
+.footer-links a{font-size:0.75rem;color:var(--muted);text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;transition:color 0.2s}
+.footer-links a:hover{color:var(--white)}
+
+/* ── SCROLL FADE ── */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity 0.75s ease,transform 0.75s ease}
+.reveal.visible{opacity:1;transform:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:1.2rem 1.5rem}
+  .nav-right{display:none}
+  .hero{padding:0 1.5rem 4rem}
+  .hero-tag{display:none}
+  .page-section{padding:5rem 1.5rem}
+  .divider{margin:0 1.5rem}
+  .how-grid,.gen-inner{grid-template-columns:1fr;gap:3rem}
+  .how-title,.gen-left-title{position:static}
+  .cards-grid,.testi-grid,.pricing-grid{grid-template-columns:1fr}
+  footer{padding:3rem 1.5rem}
+  .f-row{grid-template-columns:1fr}
+  .income-note{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Ghost<span>writer</span> Corp</div>
+  <div class="nav-right">
+    <a href="#how">Process</a>
+    <a href="#income">Revenue</a>
+    <a href="#generate">Try free</a>
+    <a href="#pricing" class="nav-pill">Start now →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-noise"></div>
+  <div class="hero-circle"></div>
+  <div class="hero-tag"><span class="dot"></span> Systems running · content live</div>
+
+  <div class="hero-eyebrow">Zero investment · Smart automation · Start today</div>
+  <h1>Your business,<br><span class="line2">running on <em>autopilot.</em></span></h1>
+
+  <div class="hero-sub">
+    <p class="hero-desc">Ghostwriter Corp automates your entire content business — newsletters, blogs & social posts — earning you affiliate commissions, sponsorships, and ad revenue while you sleep.</p>
+    <div class="hero-ctas">
+      <a href="#generate" class="cta-primary">Create free content →</a>
+      <a href="#how" class="cta-secondary">See how it works</a>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Zero startup cost <span>✦</span></span>
+    <span class="marquee-item">Automated output 24/7 <span>✦</span></span>
+    <span class="marquee-item">Affiliate income <span>✦</span></span>
+    <span class="marquee-item">Newsletter sponsorships <span>✦</span></span>
+    <span class="marquee-item">Medium Partner earnings <span>✦</span></span>
+    <span class="marquee-item">Digital products <span>✦</span></span>
+    <span class="marquee-item">Content ready in 60 seconds <span>✦</span></span>
+    <span class="marquee-item">Zero startup cost <span>✦</span></span>
+    <span class="marquee-item">Automated output 24/7 <span>✦</span></span>
+    <span class="marquee-item">Affiliate income <span>✦</span></span>
+    <span class="marquee-item">Newsletter sponsorships <span>✦</span></span>
+    <span class="marquee-item">Medium Partner earnings <span>✦</span></span>
+    <span class="marquee-item">Digital products <span>✦</span></span>
+    <span class="marquee-item">Content ready in 60 seconds <span>✦</span></span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="page-section" id="how">
+  <div class="label">Process</div>
+  <div class="how-grid">
+    <div class="how-title reveal">Four steps to <em>passive</em> income.</div>
+    <div class="steps-list reveal">
+      <div class="step-item">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Pick your niche</h3>
+          <p>Choose a profitable topic — tech tools, personal finance, SaaS reviews, health. Our platform handles the heavy lifting so you don't need to be an expert yourself.</p>
+          <span class="step-tag tag-free">Free to start</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>Smart automation creates your content</h3>
+          <p>In 60 seconds, get publish-ready newsletters, blog posts, Twitter threads, and LinkedIn articles — complete with monetization hooks — built by our content engine.</p>
+          <span class="step-tag tag-auto">Fully automated</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Publish & add affiliate links</h3>
+          <p>Post on Substack, Medium, or LinkedIn. Add your affiliate links in one click. No technical skills needed whatsoever.</p>
+          <span class="step-tag tag-free">Free platforms</span>
+        </div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">04</div>
+        <div class="step-content">
+          <h3>Revenue compounds automatically</h3>
+          <p>As your audience grows, every income stream scales — affiliate commissions, ad revenue, sponsorship deals — without proportionally more work.</p>
+          <span class="step-tag tag-auto">Passive income</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- INCOME STREAMS -->
+<section class="page-section" id="income">
+  <div class="label">Revenue streams</div>
+  <div class="income-header reveal">
+    <div class="income-title">Four ways your<br>content makes <em>money.</em></div>
+    <p class="income-note">Layer all four streams for compounding monthly income from a single automated content workflow.</p>
+  </div>
+  <div class="cards-grid reveal">
+    <div class="income-card">
+      <div class="card-icon">🔗</div>
+      <div class="card-badge">Fastest to start</div>
+      <h3>Affiliate commissions</h3>
+      <p>Embed affiliate links in auto-crafted reviews and listicles. Amazon Associates, Zerodha, ShareASale — all free to join in minutes.</p>
+      <div class="income-amount">₹5k–₹50k<sub>/month</sub></div>
+    </div>
+    <div class="income-card">
+      <div class="card-icon">📧</div>
+      <div class="card-badge">Best long-term ROI</div>
+      <h3>Newsletter sponsorships</h3>
+      <p>Grow a Substack or Beehiiv audience with weekly automated content. Sell dedicated ad spots once you cross 500 engaged subscribers.</p>
+      <div class="income-amount">₹2k–₹25k<sub>/issue</sub></div>
+    </div>
+    <div class="income-card">
+      <div class="card-icon">✍️</div>
+      <div class="card-badge">No audience needed</div>
+      <h3>Medium Partner Program</h3>
+      <p>Publish smart-crafted articles and earn based on reading time. Monetization starts from your very first article, zero followers required.</p>
+      <div class="income-amount">₹1k–₹20k<sub>/month</sub></div>
+    </div>
+    <div class="income-card">
+      <div class="card-icon">📦</div>
+      <div class="card-badge">Highest margin</div>
+      <h3>Digital products</h3>
+      <p>Package automated content into ebooks, templates, and mini-courses. Sell on Gumroad or Topmate — 90%+ margins, zero inventory.</p>
+      <div class="income-amount">₹2k–₹1L<sub>/product</sub></div>
+    </div>
+  </div>
+</section>
+
+<!-- GENERATOR -->
+<div class="gen-section" id="generate">
+  <div class="gen-inner">
+    <div class="reveal">
+      <div class="label">Content engine</div>
+      <div class="gen-left-title">Try it now.<br><em>Free.</em></div>
+      <p class="gen-left-desc">Our content engine builds your first publish-ready piece in under 60 seconds. No account needed.</p>
+    </div>
+    <div class="reveal">
+      <div class="gen-form">
+        <div>
+          <label class="f-label">Your niche</label>
+          <input class="f-input" type="text" id="niche" placeholder="e.g. personal finance India" value="personal finance India" />
+        </div>
+        <div class="f-row">
+          <div>
+            <label class="f-label">Content type</label>
+            <select class="f-select" id="ctype">
+              <option value="newsletter">📧 Newsletter issue</option>
+              <option value="blog">📝 SEO blog post</option>
+              <option value="thread">🧵 Twitter/X thread</option>
+              <option value="linkedin">💼 LinkedIn article</option>
+              <option value="review">⭐ Affiliate review</option>
+              <option value="listicle">📋 Viral listicle</option>
+            </select>
+          </div>
+          <div>
+            <label class="f-label">Tone</label>
+            <select class="f-select" id="tone">
+              <option>Casual and relatable</option>
+              <option>Expert and authoritative</option>
+              <option>Data-driven and analytical</option>
+              <option>Motivational and inspiring</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="f-label">Monetization angle (optional)</label>
+          <input class="f-input" type="text" id="angle" placeholder="e.g. Zerodha referral, Amazon affiliates" />
+        </div>
+        <button class="gen-submit" id="genBtn" onclick="doGenerate()">✦ Build my content now</button>
+        <div class="gen-loader" id="loader"><div class="gen-loader-fill"></div></div>
+        <div class="gen-output" id="genOut"></div>
+        <div class="output-bar" id="outBar">
+          <button class="out-btn" onclick="copyOut()">Copy</button>
+          <button class="out-btn" onclick="doGenerate()">Regenerate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TESTIMONIALS -->
+<section class="page-section">
+  <div class="label">Social proof</div>
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Started with zero audience and zero budget. After 90 days using automated content on Substack, I landed my first sponsor at ₹8,000 per issue. The ROI is genuinely insane.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">RK</div>
+        <div><div class="testi-name">Rahul K.</div><div class="testi-role">Finance newsletter, Mumbai</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">I was skeptical at first but the quality genuinely surprised me. Making ₹18,000/month from affiliate links in my tech reviews blog — all automated, all passive.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">PS</div>
+        <div><div class="testi-name">Priya S.</div><div class="testi-role">Tech blogger, Bangalore</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p class="testi-text">Medium Partner combined with affiliate links in the same articles. I cleared ₹35k last month with maybe 4 hours of work total. This actually works.</p>
+      <div class="testi-author">
+        <div class="testi-avatar">AM</div>
+        <div><div class="testi-name">Arjun M.</div><div class="testi-role">Freelance writer, Delhi</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section class="page-section" id="pricing">
+  <div class="label">Pricing</div>
+  <div class="reveal">
+    <div style="font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3.2rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:0.75rem">Start free. <em>Scale when ready.</em></div>
+    <p style="font-size:0.9rem;color:var(--muted);font-weight:300">No credit card required. No hidden fees.</p>
+  </div>
+  <div class="pricing-grid reveal">
+    <div class="pricing-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">Free</div>
+      <div class="plan-desc">Perfect for validating your niche</div>
+      <ul class="plan-features">
+        <li>10 content builds/month</li>
+        <li>3 content formats</li>
+        <li>Monetization tips included</li>
+        <li>Copy & publish anywhere</li>
+      </ul>
+      <button class="plan-cta cta-outline" onclick="document.getElementById('generate').scrollIntoView({behavior:'smooth'})">Try free now</button>
+    </div>
+    <div class="pricing-card hot">
+      <div class="hot-badge">Most popular</div>
+      <div class="plan-name">Creator</div>
+      <div class="plan-price">₹999<span class="period">/mo</span></div>
+      <div class="plan-desc">For serious content entrepreneurs</div>
+      <ul class="plan-features">
+        <li>Unlimited content builds</li>
+        <li>All 6 content formats</li>
+        <li>Built-in affiliate suggestions</li>
+        <li>30-day content calendar</li>
+        <li>SEO keyword optimization</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="plan-cta cta-filled">Start 7-day free trial</button>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Agency</div>
+      <div class="plan-price">₹3,999<span class="period">/mo</span></div>
+      <div class="plan-desc">For multiple niches or client work</div>
+      <ul class="plan-features">
+        <li>Everything in Creator</li>
+        <li>5 brand profiles</li>
+        <li>White-label content output</li>
+        <li>API access</li>
+        <li>Dedicated account manager</li>
+      </ul>
+      <button class="plan-cta cta-outline">Contact sales</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    Ghost<span>writer</span> Corp
+    <p>The world's content, written by your business.<br>Zero investment. Real passive income.</p>
+  </div>
+  <div class="footer-links">
+    <a href="#how">Process</a>
+    <a href="#income">Revenue</a>
+    <a href="#generate">Generate</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+</footer>
+
+<script>
+// Custom cursor
+const cur = document.getElementById('cur');
+const ring = document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=(mx-4)+'px';cur.style.top=(my-4)+'px';
+});
+(function animRing(){
+  rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,.income-card,.step-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{ring.style.transform='translate(-50%,-50%) scale(1.6)';ring.style.borderColor='rgba(232,197,71,0.6)'});
+  el.addEventListener('mouseleave',()=>{ring.style.transform='translate(-50%,-50%) scale(1)';ring.style.borderColor='rgba(232,197,71,0.4)'});
+});
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Generator
+const typeMap={
+  newsletter:'a complete newsletter issue with subject line, intro hook, 3 main sections with actionable insights, and a strong CTA',
+  blog:'an SEO-optimized blog post with compelling H1, engaging intro, 4 in-depth sections, and a conclusion',
+  thread:'a Twitter/X thread with 10 numbered tweets, starting with a scroll-stopping hook',
+  linkedin:'a LinkedIn article with bold opening line, 4 insight sections, and a closing engagement question',
+  review:'an affiliate product review with overview, 5 pros, 3 cons, who it\'s for, and a buying recommendation',
+  listicle:'a viral listicle with 7 items, each with a punchy headline and 2-sentence description'
+};
+
+async function doGenerate(){
+  const niche=document.getElementById('niche').value.trim()||'personal finance India';
+  const type=document.getElementById('ctype').value;
+  const tone=document.getElementById('tone').value;
+  const angle=document.getElementById('angle').value.trim();
+  const btn=document.getElementById('genBtn');
+  const loader=document.getElementById('loader');
+  const out=document.getElementById('genOut');
+  const bar=document.getElementById('outBar');
+  const extra=angle?`\n\nNaturally weave in this monetization angle: ${angle}`:'';
+  const prompt=`Write ${typeMap[type]} for a ${tone.toLowerCase()} content brand in the niche: "${niche}". Make it genuinely useful, specific, and engaging with real actionable advice. Format it clearly.${extra}\n\nEnd with: "💡 Monetize this:" and one specific monetization idea for this piece.`;
+  btn.disabled=true;btn.textContent='⟳  Building your content...';
+  loader.classList.add('active');out.classList.remove('show');bar.classList.remove('show');
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const text=data.content?.map(b=>b.text||'').join('')||'Error — please try again.';
+    out.textContent=text;out.classList.add('show');bar.classList.add('show');
+  }catch(e){out.textContent='Something went wrong. Please try again.';out.classList.add('show')}
+  btn.disabled=false;btn.textContent='✦ Build my content now';loader.classList.remove('active');
+}
+
+function copyOut(){
+  navigator.clipboard.writeText(document.getElementById('genOut').textContent);
+  const b=event.target;b.textContent='✓ Copied!';setTimeout(()=>b.textContent='Copy',2000);
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
